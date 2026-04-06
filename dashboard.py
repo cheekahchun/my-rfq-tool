@@ -519,20 +519,44 @@ def main_dashboard(user_info):
         config = load_config()
         with st.form("config_form"):
             new_cfg = {}
-            new_cfg['IMAP_SERVER'] = st.text_input("IMAP Server", config.get('IMAP_SERVER',''))
-            new_cfg['EMAIL_USER'] = st.text_input("Email Username", config.get('EMAIL_USER',''))
-            new_cfg['EMAIL_PASSWORD'] = st.text_input("Email Password", config.get('EMAIL_PASSWORD',''), type="password")
+            # 🛡️ 系统安全性设置 (ID/Password)
+            st.write("--- 🛡️ App Access Security ---")
+            c_auth1, c_auth2 = st.columns(2)
+            with c_auth1:
+                new_cfg['APP_USERNAME'] = st.text_input("Admin Login ID", config.get('APP_USERNAME', 'admin'))
+            with c_auth2:
+                new_cfg['APP_PASSWORD'] = st.text_input("Admin Login Password", config.get('APP_PASSWORD', 'admin123'), type="password")
+
+            # 💼 Portal 采购账号设置
+            st.write("--- 💼 RFQ Portal Credentials ---")
+            new_cfg['RFQ_URL'] = st.text_input("RFQ Portal URL", config.get('RFQ_URL', ''))
+            c_rfq1, c_rfq2 = st.columns(2)
+            with c_rfq1:
+                new_cfg['RFQ_EMAIL'] = st.text_input("Portal Login Email", config.get('RFQ_EMAIL', ''))
+            with c_rfq2:
+                new_cfg['RFQ_PASSWORD'] = st.text_input("Portal Login Password", config.get('RFQ_PASSWORD', ''), type="password")
+            new_cfg['PORTAL_USER_NAME'] = st.text_input("Portal Display Name (Filter)", config.get('PORTAL_USER_NAME', 'Chee Kah Chun'))
+            
+            # 📍 外部同步 & API Key
+            st.write("--- 📍 Analysis & Sync ---")
             new_cfg['GEMINI_API_KEY'] = st.text_input("Gemini API Key", config.get('GEMINI_API_KEY',''), type="password")
             new_cfg['SPREADSHEET_ID'] = st.text_input("Google Sheet ID", config.get('SPREADSHEET_ID',''))
-            new_cfg['ENABLE_GSHEET'] = str(st.checkbox("Enable Google Sheet Sync", value=(config.get('ENABLE_GSHEET','True').upper() == 'TRUE')))
-            new_cfg['RFQ_URL'] = st.text_input("RFQ Portal URL", config.get('RFQ_URL',''))
-            new_cfg['PORTAL_USER_NAME'] = st.text_input("Portal Creator Name (Filter)", config.get('PORTAL_USER_NAME','Chee Kah Chun'))
+            new_cfg['ENABLE_GSHEET'] = str(st.checkbox("Enable Sync", value=(config.get('ENABLE_GSHEET','True').upper() == 'TRUE')))
             
-            # Keep hidden ones
-            for k in ['IMAP_PORT', 'CHECK_INTERVAL_SECONDS', 'OUTPUT_DIR', 'RFQ_EMAIL', 'RFQ_PASSWORD']:
+            # 📥 数据一键导入 (从本地搬家到云端)
+            st.write("--- 📥 Data Migration (Import Local Excel) ---")
+            uploaded_master = st.file_uploader("Upload your Master_Orders.xlsx to Cloud", type=['xlsx'])
+            if uploaded_master:
+                if st.button("🚀 Confirm Import & Merge Data"):
+                    with open(MASTER_FILE, "wb") as f: f.write(uploaded_master.getbuffer())
+                    st.success("✅ Master Data imported! Please refresh.")
+                    time.sleep(1); st.rerun()
+
+            # 保存逻辑
+            for k in ['IMAP_SERVER', 'IMAP_PORT', 'EMAIL_USER', 'EMAIL_PASSWORD', 'CHECK_INTERVAL_SECONDS', 'OUTPUT_DIR']:
                 new_cfg[k] = config.get(k, '')
                 
-            if st.form_submit_button("💾 Save All Config"):
+            if st.form_submit_button("💾 Save All Config & Apply"):
                 save_config(new_cfg)
                 st.success("Config saved successfully!")
 
