@@ -334,7 +334,7 @@ def main_dashboard(user_info):
                 cols = ['Customer Name'] + [c for c in f_df.columns if c != 'Customer Name']
                 f_df = f_df[cols]
 
-            st.dataframe(f_df.style.applymap(color_status, subset=['Status']), use_container_width=True, height=400)
+            st.dataframe(f_df.style.map(color_status, subset=['Status']), use_container_width=True, height=400)
 
             # --- Row Action (Redesigned for better focus) ---
             if not f_df.empty:
@@ -506,7 +506,7 @@ def main_dashboard(user_info):
 
                 if not rdf.empty:
                     if 'Status' in rdf.columns:
-                        st.dataframe(rdf.style.applymap(color_rfq_status, subset=['Status']), use_container_width=True)
+                        st.dataframe(rdf.style.map(color_rfq_status, subset=['Status']), use_container_width=True)
                     else:
                         st.dataframe(rdf, use_container_width=True)
                 else:
