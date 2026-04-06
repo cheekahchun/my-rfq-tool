@@ -31,8 +31,8 @@ def _get_config():
 
 _config      = _get_config()
 RFQ_BASE_URL = _config.get("RFQ_URL",      "http://192.168.68.33")
-RFQ_EMAIL    = _config.get("RFQ_EMAIL",    "kcchee@genxai.com.my")
-RFQ_PASSWORD = _config.get("RFQ_PASSWORD", "12345678")
+RFQ_EMAIL    = _config.get("RFQ_EMAIL", "")     # <--- 从 config.txt 读取
+RFQ_PASSWORD = _config.get("RFQ_PASSWORD", "")  # <--- 从 config.txt 读取
 
 LOGIN_URL      = f"{RFQ_BASE_URL}/genxai/auth/login"
 RFQ_CREATE_URL = f"{RFQ_BASE_URL}/genxai/rfqs"
