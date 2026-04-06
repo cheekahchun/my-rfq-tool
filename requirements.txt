@@ -1,0 +1,10 @@
+streamlit
+pandas
+openpyxl
+imap-tools
+plyer
+google-genai
+gspread
+google-auth
+python-dotenv
+Pillow
