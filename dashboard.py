@@ -543,15 +543,6 @@ def main_dashboard(user_info):
             new_cfg['SPREADSHEET_ID'] = st.text_input("Google Sheet ID", config.get('SPREADSHEET_ID',''))
             new_cfg['ENABLE_GSHEET'] = str(st.checkbox("Enable Sync", value=(config.get('ENABLE_GSHEET','True').upper() == 'TRUE')))
             
-            # 📥 数据一键导入 (从本地搬家到云端)
-            st.write("--- 📥 Data Migration (Import Local Excel) ---")
-            uploaded_master = st.file_uploader("Upload your Master_Orders.xlsx to Cloud", type=['xlsx'])
-            if uploaded_master:
-                if st.button("🚀 Confirm Import & Merge Data"):
-                    with open(MASTER_FILE, "wb") as f: f.write(uploaded_master.getbuffer())
-                    st.success("✅ Master Data imported! Please refresh.")
-                    time.sleep(1); st.rerun()
-
             # 保存逻辑
             for k in ['IMAP_SERVER', 'IMAP_PORT', 'EMAIL_USER', 'EMAIL_PASSWORD', 'CHECK_INTERVAL_SECONDS', 'OUTPUT_DIR']:
                 new_cfg[k] = config.get(k, '')
@@ -559,6 +550,17 @@ def main_dashboard(user_info):
             if st.form_submit_button("💾 Save All Config & Apply"):
                 save_config(new_cfg)
                 st.success("Config saved successfully!")
+
+        # 📥 数据一键导入必须放在 form 外面，否则会报错
+        st.write("--- 📥 Data Migration (Import Local Excel) ---")
+        uploaded_master = st.file_uploader("Upload your Master_Orders.xlsx to Cloud", type=['xlsx'], key='master_up')
+        if uploaded_master:
+            if st.button("🚀 Confirm Import & Merge Data"):
+                with open(MASTER_FILE, "wb") as f:
+                    f.write(uploaded_master.getbuffer())
+                st.success("✅ Master Data imported! Please refresh the page.")
+                time.sleep(1)
+                st.rerun()
 
     # --- PAGE: USER MANAGEMENT (Admin Only) ---
     elif active_page == 'Users' and user_info['role'] == 'admin':
